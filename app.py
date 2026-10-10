@@ -60,11 +60,20 @@ with col_chart1:
 # Chart 2: ไทม์ไลน์การสอบ
 with col_chart2:
     st.subheader("กำหนดการสอบ (Timeline)")
-    # เพิ่ม color_discrete_map เข้าไปตรงนี้
+    
+    # สร้างคอลัมน์ใหม่สำหรับแปลงวันที่ให้อยู่ในรูปแบบที่อ่านง่ายขึ้น เช่น '06-Sep'
+    filtered_df['Date Label'] = filtered_df['Exam Date'].dt.strftime('%d-%b')
+    
     fig_timeline = px.scatter(filtered_df, x="Exam Date", y="Exam/Project", color="status", 
-                              color_discrete_map={'Waiting':'#FF9933', 'Done':'#00CC66'}, # เปลี่ยนรหัสสีที่นี่
+                              text="Date Label", # เพิ่มบรรทัดนี้เพื่อบอกให้เอาคอลัมน์ Date Label มาแสดงเป็นข้อความ
                               hover_data=["Child Name", "Subjects", "Venue"], size_max=60)
-    fig_timeline.update_traces(marker=dict(size=15))
+    
+    # เพิ่ม textposition='top center' เพื่อให้ข้อความลอยอยู่ด้านบนของจุดกราฟ จะได้ไม่บังจุด
+    fig_timeline.update_traces(marker=dict(size=15), textposition='top center')
+    
+    # (ทางเลือก) ปรับให้แกน Y กว้างขึ้นนิดหน่อย ข้อความจะได้ไม่โดนตัดตรงขอบบน
+    fig_timeline.update_layout(margin=dict(t=30))
+    
     st.plotly_chart(fig_timeline, use_container_width=True)
 # ตารางแสดงข้อมูลรายละเอียด
 st.subheader("📋 รายละเอียดข้อมูลการสอบ")
