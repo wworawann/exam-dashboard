@@ -78,3 +78,5 @@ with col_chart2:
 # ตารางแสดงข้อมูลรายละเอียด
 st.subheader("📋 รายละเอียดข้อมูลการสอบ")
 st.dataframe(filtered_df[['Exam/Project', 'Child Name', 'Subjects', 'Exam Date', 'Venue', 'status']], use_container_width=True)
+st.subheader("📋 รายละเอียดข้อมูลการสอบ")
+st.dataframe(filtered_df[['Exam/Project', 'Child Name', 'Subjects', 'Exam Date', 'Venue', 'status']], use_container_width=True)
