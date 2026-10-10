@@ -46,6 +46,7 @@ col3.metric("รอสอบ (Waiting)", len(filtered_df[filtered_df['status'] =
 
 st.markdown("---")
 
+# ใช้ st.columns(2) เหมือนเดิม (บนมือถือระบบจะปัดให้เป็นบน-ล่างอัตโนมัติ)
 col_chart1, col_chart2 = st.columns(2)
 
 # Chart 1: สัดส่วนสถานะการสอบ
@@ -54,30 +55,33 @@ with col_chart1:
     status_counts = filtered_df['status'].value_counts().reset_index()
     status_counts.columns = ['Status', 'Count']
     fig_status = px.pie(status_counts, values='Count', names='Status', color='Status', 
-                        color_discrete_map={'Waiting':'#FFA07A', 'Done':'#90EE90'})
+                        color_discrete_map={'Waiting':'#FF9933', 'Done':'#00CC66'})
+    
+    # ย้าย Legend มาไว้ด้านล่างตรงกลาง เพื่อไม่ให้กินพื้นที่ด้านข้างบนมือถือ
+    fig_status.update_layout(legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5))
+    
     st.plotly_chart(fig_status, use_container_width=True)
+
 # Chart 2: ไทม์ไลน์การสอบ
 with col_chart2:
     st.subheader("กำหนดการสอบ (Timeline)")
-    
-    # สร้างคอลัมน์ใหม่สำหรับแปลงวันที่ให้อยู่ในรูปแบบที่อ่านง่ายขึ้น เช่น '06-Sep'
     filtered_df['Date Label'] = filtered_df['Exam Date'].dt.strftime('%d-%b')
     
-    # เพิ่ม text="Date Label" และ color_discrete_map เพื่อกำหนดสีตามสถานะ
     fig_timeline = px.scatter(filtered_df, x="Exam Date", y="Exam/Project", color="status", 
                               color_discrete_map={'Waiting':'#FF9933', 'Done':'#00CC66'}, 
                               text="Date Label", 
                               hover_data=["Child Name", "Subjects", "Venue"], size_max=60)
     
-    # จัดตำแหน่งข้อความให้อยู่ด้านบนของจุด (top center) และกำหนดขนาดจุด
     fig_timeline.update_traces(marker=dict(size=15), textposition='top center')
     
-    # ปรับขอบด้านบนของกราฟเผื่อพื้นที่ให้ข้อความไม่โดนตัด
-    fig_timeline.update_layout(margin=dict(t=30))
+    # ย้าย Legend มาไว้ด้านล่างตรงกลาง และเพิ่มขอบบน (margin t) ให้ข้อความไม่โดนตัด
+    fig_timeline.update_layout(
+        margin=dict(t=40),
+        legend=dict(orientation="h", yanchor="bottom", y=-0.4, xanchor="center", x=0.5)
+    )
     
     st.plotly_chart(fig_timeline, use_container_width=True)
 
 # ตารางแสดงข้อมูลรายละเอียด
 st.subheader("📋 รายละเอียดข้อมูลการสอบ")
 st.dataframe(filtered_df[['Exam/Project', 'Child Name', 'Subjects', 'Exam Date', 'Venue', 'status']], use_container_width=True)
-
